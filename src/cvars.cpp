@@ -232,6 +232,13 @@ void CV_RegisterList(CVarList* list)
 	list->finish();
 }
 
+void KartFinishLineTicker_OnChange(void)
+{
+    // Immediately empty the queue
+    if (!cv_show_riders_finish_ticker.value)
+        RR_resetRidersFinishTicker();
+}
+
 // clang-format off
 
 extern "C" {
@@ -1522,6 +1529,7 @@ consvar_t cv_driftgauge = Player("rrdriftgauge", "Off").on_off();
 consvar_t cv_driftgaugeoffset = Player("rrdriftgaugeoffset", "0").floating_point();
 consvar_t cv_gingeritemtimers = Player("huditemtimers", "On").on_off();
 consvar_t cv_rouletteonplayer = Player("rouletteonplayer", "On").on_off();
+consvar_t cv_show_riders_finish_ticker = Player("ridersfinishticker", "On").on_off().onchange_noinit(KartFinishLineTicker_OnChange);
 
 //
 // Initialized by CVarList::load...

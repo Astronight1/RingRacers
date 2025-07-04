@@ -58,6 +58,8 @@
 #include "deh_tables.h" // MOBJTYPE_LIST
 #endif
 
+#include "noire/n_hud.h"
+
 tic_t leveltime;
 boolean thinkersCompleted;
 
@@ -1353,6 +1355,7 @@ void P_Ticker(boolean run)
 	{
 		K_TickDialogue();
 		K_TickMessages();
+		RR_ridersFinishTick();
 	}
 
 	if (run)

@@ -129,6 +129,8 @@
 extern "C" consvar_t cv_continuousmusic;
 boolean g_reloadinggamestate = false;
 
+#include "noire/n_hud.h"
+
 //
 // Map MD5, calculated on level load.
 // Sent to clients in PT_SERVERINFO.
@@ -8619,7 +8621,8 @@ boolean P_LoadLevel(boolean fromnetsave, boolean reloadinggamestate)
 	R_InitMobjInterpolators();
 	P_InitCachedActions();
 
-	K_ClearPersistentMessages();
+	
+	RR_resetRidersFinishTicker();
 
 	// internal game map
 	maplumpname = mapheaderinfo[gamemap-1]->lumpname;

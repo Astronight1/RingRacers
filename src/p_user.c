@@ -80,6 +80,7 @@
 #endif
 
 #include "hep2/h_cvars.h"
+#include "noire/n_hud.h"
 
 #if 0
 static void P_NukeAllPlayers(player_t *player);
@@ -1246,6 +1247,8 @@ void P_DoPlayerExit(player_t *player, pflags_t flags)
 
 	if (!player->spectator && (gametyperules & GTR_CIRCUIT)) // Special Race-like handling
 	{
+		// RADIO: add the player to the finish ticker queue
+		RR_addPlayerToFinshTicker(player);
 		K_UpdateAllPlayerPositions();
 	}
 

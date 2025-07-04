@@ -70,6 +70,15 @@ extern patch_t *kp_oldwinnernum[7];
 void N_LoadOldPositionNumbers(void);
 void N_DrawKartOldPositionNum(INT32 num);
 
+/**
+ * Race HUD
+ */
+extern void RR_addPlayerToFinshTicker(player_t *player);
+extern void RR_drawRidersFinishTicker(void);
+extern void RR_ridersFinishTick(void);
+extern void RR_resetRidersFinishTicker(void);
+extern void RR_DrawKartLapsMini(void);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

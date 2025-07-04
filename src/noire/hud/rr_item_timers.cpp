@@ -6,7 +6,7 @@
 // terms of the GNU General Public License, version 2.
 // See the 'LICENSE' file for more details.
 //-----------------------------------------------------------------------------
-/// \file radioracers/rr_item_timers.cpp
+/// \file radioracers/hud/rr_item_timers.cpp
 /// \brief Backporting a debugging script I wrote back in 2020
 
 #include <algorithm>
@@ -18,7 +18,6 @@
 
 #include "../n_hud.h"
 #include "../n_cvar.h"
-
 
 #include "../../doomstat.h"
 #include "../../p_local.h"
@@ -36,6 +35,7 @@ constexpr const int SHIFT_X = 17; // To the left, to the left
 
 const std::vector start_boost_patches = {"DBOSA5", "DBOSB5", "DBOSC5"};
 const std::vector drift_patches = {"DRIFC3C7", "DRIFD3D7", "DRIFA3A7"};
+const std::vector voltage_patches = {"TRC3B0", "TRC3C0", "TRC3D0", "TRC3E0", "TRC3F0"};
 
 // STRUCTS
 
@@ -91,6 +91,9 @@ std::vector<ItemTimer> getTimers(void) {
     // Boost
     timers.push_back({stplyr->sneakertimer, "K_ISSHOE"});
 
+    // Hyuu
+    timers.push_back({stplyr->hyudorotimer, "K_ISHYUD"});
+
     // Drift charge
     
     std::pair<int, int> drift_patches_offsets = {12, 17};
@@ -125,9 +128,26 @@ std::vector<ItemTimer> getTimers(void) {
         K_RainbowColor(leveltime)
     });
 
+    // Voltage timer (trick boost)
+    timers.push_back({
+        stplyr->trickcharge, 
+        voltage_patches[leveltime % voltage_patches.size()],
+        0.3,
+        {14, 15}
+    });
+
+    // Wavedash
+    timers.push_back({
+        stplyr->wavedashboost,
+        "SLPTHLHR",
+        0.3,
+        {14, 15}
+    });
+
     // FAULT!
-    if (stplyr->pflags & PF_VOID) {
-        timers.push_back({stplyr->mo->hitlag, "K_NOBLNS", {}, {7, 6}});
+    if ((stplyr->pflags & PF_VOID || stplyr->pflags & PF_FAULT)) {
+        if (stplyr->mo)
+            timers.push_back({stplyr->mo->hitlag, "K_NOBLNS", {}, {7, 6}});
     }
 
     // Battle powerups

@@ -1639,7 +1639,7 @@ static void K_drawKartItem(void)
 		fy = ITEM_Y;
 
 		// We are NOT supporting this for splitscreen, the vanilla layout is easier to read.
-		if (cv_rouletteonplayer.value && r_splitscreen == 0)
+		if (cv_rouletteonplayer.value)
 		{
 			trackingResult_t result = K_getRoulettePositionForTrackingPlayer();
 
@@ -6878,6 +6878,8 @@ void K_drawKartHUD(void)
 			}
 		}
 	}
+
+	RR_drawRidersFinishTicker();
 
 	if (!stplyr->spectator && !freecam) // Bottom of the screen elements, don't need in spectate mode
 	{
