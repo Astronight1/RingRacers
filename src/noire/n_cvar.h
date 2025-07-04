@@ -29,6 +29,7 @@ extern consvar_t cv_highresportrait;
 extern consvar_t cv_driftgauge;
 extern consvar_t cv_driftgaugeoffset;
 extern consvar_t cv_gingeritemtimers;
+extern consvar_t cv_rouletteonplayer;
 
 void ColorHUD_OnChange(void);
 
