@@ -25,6 +25,9 @@ extern consvar_t cv_oldpositiondisplay;
 extern consvar_t cv_extendedspeedometer;
 extern consvar_t cv_highresportrait;
 
+extern consvar_t cv_driftgauge;
+extern consvar_t cv_driftgaugeoffset;
+
 void ColorHUD_OnChange(void);
 
 #ifdef __cplusplus

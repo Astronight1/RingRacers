@@ -1515,6 +1515,13 @@ void CV_EnforceExecVersion(void);
 consvar_t cv_execversion = Server(cvlist_execversion)("execversion", "1").dont_save().values(CV_Unsigned).onchange(CV_EnforceExecVersion);
 
 //
+// HEP3
+//
+
+consvar_t cv_driftgauge = Player("rrdriftgauge", "Off").on_off();
+consvar_t cv_driftgaugeoffset = Player("rrdriftgaugeoffset", "0").floating_point();
+
+//
 // Initialized by CVarList::load...
 //
 

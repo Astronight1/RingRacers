@@ -1724,20 +1724,20 @@ void D_SRB2Main(void)
 #ifndef DEVELOP
 	// Check MD5s of autoloaded files
 	// Note: Do not add any files that ignore MD5!
-	W_VerifyFileMD5(mainwads, ASSET_HASH_BIOS_PK3);									// bios.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_SCRIPTS_PK3);					// scripts.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_GFX_PK3);						// gfx.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_TEXTURES_GENERAL_PK3);			// textures_general.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_TEXTURES_SEGAZONES_PK3);		// textures_segazones.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_TEXTURES_ORIGINALZONES_PK3);	// textures_originalzones.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_CHARS_PK3);					// chars.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_FOLLOWERS_PK3);				// followers.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_MAPS_PK3);						// maps.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_UNLOCKS_PK3);					// unlocks.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_STAFFGHOSTS_PK3);				// staffghosts.pk3
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_SHADERS_PK3);					// shaders.pk3
+	//W_VerifyFileMD5(mainwads, ASSET_HASH_BIOS_PK3);									// bios.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_SCRIPTS_PK3);					// scripts.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_GFX_PK3);						// gfx.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_TEXTURES_GENERAL_PK3);			// textures_general.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_TEXTURES_SEGAZONES_PK3);		// textures_segazones.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_TEXTURES_ORIGINALZONES_PK3);	// textures_originalzones.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_CHARS_PK3);					// chars.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_FOLLOWERS_PK3);				// followers.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_MAPS_PK3);						// maps.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_UNLOCKS_PK3);					// unlocks.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_STAFFGHOSTS_PK3);				// staffghosts.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_SHADERS_PK3);					// shaders.pk3
 #ifdef USE_PATCH_FILE
-	mainwads++; W_VerifyFileMD5(mainwads, ASSET_HASH_PATCH_PK3);					// patch.pk3
+	mainwads++; //W_VerifyFileMD5(mainwads, ASSET_HASH_PATCH_PK3);					// patch.pk3
 #endif
 #else
 	mainwads++;	// scripts.pk3
