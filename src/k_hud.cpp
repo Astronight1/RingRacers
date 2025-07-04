@@ -1639,7 +1639,7 @@ static void K_drawKartItem(void)
 		fy = ITEM_Y;
 
 		// We are NOT supporting this for splitscreen, the vanilla layout is easier to read.
-		if (cv_rouletteonplayer.value)
+		if (cv_rouletteonplayer.value == 1 && r_splitscreen == 0)
 		{
 			trackingResult_t result = K_getRoulettePositionForTrackingPlayer();
 
@@ -1647,7 +1647,6 @@ static void K_drawKartItem(void)
 			{
 				shouldDrawOnPlayer = true;
 				const boolean rouletteIsActive = (stplyr->itemRoulette.active == true);
-
 				/**
 				 * This solution WILL obscure the player's view.
 				 * The item roulette background is transparent .. but some items are pretty loud visually (e.g. flame shield)
@@ -1698,9 +1697,22 @@ static void K_drawKartItem(void)
 	}
 
 	// V_DrawScaledPatch(fx, fy, V_TRANSLUCENT|V_SLIDEIN|fflags, localbg);
+
+	/**
+	 * Normally, this would just follow the V_HUDTRANS flag from the get-go.
+	 * But if you're playing with the HUD 100% opaque, it's gonna block vision easily. 
+	 * At the very least, I'll enforce a slightly lower translucency.. until their hud transluency is low enough.
+	 */
+	INT32 itemBackgroundFlags = baseVideoFlags|fflags;
+	if (shouldDrawOnPlayer) 
+	{
+		itemBackgroundFlags = V_70TRANS|fflags;
+		if (stplyr->exiting)
+			itemBackgroundFlags = V_HUDTRANS;
+	}
 	V_DrawFixedPatch(
 		(fx<<FRACBITS), (fy<<FRACBITS), 
-		baseHudScale, baseVideoFlags|fflags,
+		baseHudScale, itemBackgroundFlags,
 		localbg, 0
 	);
 
@@ -1714,6 +1726,30 @@ static void K_drawKartItem(void)
 	auto draw_item = [&](fixed_t y, int i)
 	{
 		const UINT8 *colormap = (localcolor[i] ? R_GetTranslationColormap(colormode[i], localcolor[i], GTC_CACHE) : NULL);
+		// INT32 stupidflags = baseVideoFlags|fflags;
+		// if (i == 0 || i == 2) {
+
+		// 	INT32 offset = rouletteOffset / FRACUNIT;
+		// 	if (i == 0) {
+		// 		if (offset > 0) {
+		// 			if (offset > 9)
+		// 				offset = 9;
+		// 			transnum_t alpha = static_cast<transnum_t>(offset);
+		// 			stupidflags = (alpha << V_ALPHASHIFT);
+		// 		}
+		// 	} else {
+		// 		if (offset < 0) {
+		// 			INT32 absoffset = abs(offset);
+		// 			if (absoffset < 1)
+		// 				absoffset = 1;
+		// 			if (absoffset > 8)
+		// 				absoffset = 8;
+					
+		// 			CONS_Printf("offset %d / calc offset %d\n", absoffset, absoffset);
+		// 			stupidflags = (static_cast<transnum_t>(absoffset) << V_ALPHASHIFT);
+		// 		}
+		// 	}
+		// }
 		V_DrawFixedPatch(
 			fx<<FRACBITS, (fy<<FRACBITS) + rouletteOffset + y,
 			baseHudScale, baseVideoFlags|fflags,
@@ -1763,7 +1799,7 @@ static void K_drawKartItem(void)
 		// RadioRacers
 		if (shouldDrawOnPlayer)
 		{
-			transflag = V_30TRANS;
+			transflag = V_40TRANS;
 			/**
 			 * RadioRacers
 			 * 
@@ -1881,8 +1917,8 @@ static void K_drawKartItem(void)
 
 		INT32 itemTimerFlags = V_HUDTRANS|V_SLIDEIN|fflags;
 		if (shouldDrawOnPlayer) {
-			x = (int) (11 * baseHudScaleFloat) - 3;
-			y = (int) (35 * baseHudScaleFloat);
+			x = (int) (11 * baseHudScaleFloat) - 5;
+			y = (int) (35 * baseHudScaleFloat) + 5;
 
 			itemTimerFlags = V_HUDTRANS|fflags;
 		}
@@ -2009,7 +2045,7 @@ static void K_drawKartSlotMachine(void)
 	const UINT8 offset = ((r_splitscreen > 1) ? 1 : 0);
 
 	patch_t *localpatch[3] = { kp_nodraw, kp_nodraw, kp_nodraw };
-	patch_t *localbg = offset ? K_getSlotMachinePatch(1) : K_getSlotMachinePatch(0);
+	patch_t *localbg = offset ? kp_ringbg[1] : kp_ringbg[0];
 
 	// == SHITGARBAGE UNLIMITED 2: RISE OF MY ASS ==
 	// FIVE LAYERS OF BULLSHIT PER-PIXEL SHOVING BECAUSE THE PATCHES HAVE DIFFERENT OFFSETS
@@ -2021,13 +2057,18 @@ static void K_drawKartSlotMachine(void)
 	INT32 vstretch = 0;
 	INT32 hstretch = 3;
 	INT32 splitbsx = 0, splitbsy = 0;
-	skincolornum_t localcolor[3] = { static_cast<skincolornum_t>(K_GetHudColor()) };
+	skincolornum_t localcolor[3] = { static_cast<skincolornum_t>(stplyr->skincolor) };
 	SINT8 colormode[3] = { TC_RAINBOW };
 
 	fixed_t rouletteOffset = 0;
 	fixed_t rouletteSpace = SLOT_SPACING;
 	vector2_t rouletteCrop = {10, 10};
 	INT32 i;
+
+	// RadioRacers
+	boolean shouldDrawOnPlayer = false;
+	INT32 baseVideoFlags = V_HUDTRANS|V_SLIDEIN;
+	fixed_t baseHudScale = FRACUNIT;
 
 	if (stplyr->itemRoulette.itemListLen > 0)
 	{
@@ -2106,7 +2147,57 @@ static void K_drawKartSlotMachine(void)
 	{
 		fx = ITEM_X;
 		fy = ITEM_Y;
-		fflags = V_SNAPTOTOP|V_SNAPTOLEFT|V_SPLITSCREEN;
+
+		// We are NOT supporting this for splitscreen, the vanilla layout is easier to read.
+		if (cv_rouletteonplayer.value && r_splitscreen == 0 && !stplyr->exiting)
+		{
+			trackingResult_t result = K_getRoulettePositionForTrackingPlayer();
+
+			if(result.x != 0 && result.y != 0)
+			{
+				shouldDrawOnPlayer = true;
+				baseHudScale = (3*FRACUNIT)/5; // 60% the size the item slot is usually drawn at
+				float baseHudScaleFloat = (float)((float)(baseHudScale) / (FRACUNIT));
+
+				// Upside down?
+				const boolean isupsidedown = (stplyr->mo->eflags & MFE_VERTICALFLIP);	
+
+				/**
+				 * Offset it horizontally so it's closer to the center of the player.
+				 * Offset it vertically so it's floating above the player.
+				 */
+				INT32 base_x = (int) ((25 * baseHudScaleFloat) + 2);
+				INT32 base_y = (int) ((18 * baseHudScaleFloat) + 8);
+				INT32 baseUpsideDown_y = (int) ((15 * baseHudScaleFloat) + 5);
+
+				fx = (result.x / FRACUNIT) - base_x; 
+				fy = (result.y / FRACUNIT) - (isupsidedown ? baseUpsideDown_y : base_y);
+
+				// In case I forget the math.. 
+				// SLOT_SPACING (40) * baseHudScale
+				// If we're drawing the item box at 75% scale, then it's 40 * 75%;
+				rouletteSpace = ((int)((40 * baseHudScaleFloat) + 1) << FRACBITS);
+				rouletteCrop.x = (int)(10 * baseHudScaleFloat);
+
+				// Can't figure out the math to get this to scale alongside the base hud scale
+				rouletteCrop.y = 8;
+
+				rouletteOffset = FixedMul(rouletteOffset, FixedDiv(rouletteSpace, SLOT_SPACING));
+
+				/**
+				 * This solution WILL obscure the player's view.
+				 * Especially since the ring roulette has a solid white background.
+				 * Making it scale any smaller than 60% is unreasonable (it spins pretty fast towards the end of a race)..
+				 * so we'll just make it a bit translucent.
+				 */
+				baseVideoFlags = (stplyr->itemRoulette.active == true) ? V_40TRANS : V_TRANSLUCENT;
+
+				if (stplyr->exiting)
+					baseVideoFlags = V_HUDTRANS;
+			}
+		} else {
+			fflags = V_SNAPTOTOP|V_SNAPTOLEFT|V_SPLITSCREEN;
+		}
 	}
 
 	if (r_splitscreen == 1)
@@ -2114,13 +2205,17 @@ static void K_drawKartSlotMachine(void)
 		fy -= 5;
 	}
 
-	UINT8 *colormap = R_GetTranslationColormap(TC_DEFAULT, static_cast<skincolornum_t>(K_GetHudColor()), GTC_CACHE);
-	V_DrawMappedPatch(fx, fy, V_HUDTRANS|V_SLIDEIN|fflags, localbg, (K_UseColorHud()) ? colormap : NULL);
+	V_DrawFixedPatch(
+		(fx<<FRACBITS), (fy<<FRACBITS), 
+		baseHudScale, baseVideoFlags|fflags,
+		localbg, 0
+	);
 
+	INT32 clipRectFlags = (shouldDrawOnPlayer ? 0 : V_SLIDEIN|fflags);
 	V_SetClipRect(
 		((fx + rouletteCrop.x + boxoffx + splitbsx) << FRACBITS), ((fy + rouletteCrop.y + boxoffy - vstretch + splitbsy) << FRACBITS),
 		rouletteSpace + (hstretch<<FRACBITS), rouletteSpace + (vstretch<<FRACBITS),
-		V_SLIDEIN|fflags
+		clipRectFlags
 	);
 
 	// item box has special layering, transparency, different sized patches, other fucked up shit
@@ -2130,7 +2225,7 @@ static void K_drawKartSlotMachine(void)
 	{
 		V_DrawFixedPatch(
 			((fx)<<FRACBITS), ((fy)<<FRACBITS) + rouletteOffset,
-			FRACUNIT, V_HUDTRANS|V_SLIDEIN|fflags,
+			baseHudScale, baseVideoFlags|fflags,
 			localpatch[i], (localcolor[i] ? R_GetTranslationColormap(colormode[i], localcolor[i], GTC_CACHE) : NULL)
 		);
 
@@ -2502,6 +2597,7 @@ static void K_DrawKartPositionNum(UINT8 num)
 	// pain and suffering defined below
 	if (!r_splitscreen)
 	{
+		const boolean isDrawingInput = gamestate == GS_LEVEL && cv_drawinput.value && cv_inputdisplaytogglesize.value;
 		fx = BASEVIDWIDTH << FRACBITS;
 		fy = BASEVIDHEIGHT << FRACBITS;
 		fflags = V_SNAPTOBOTTOM|V_SNAPTORIGHT;
@@ -3417,6 +3513,12 @@ static void K_drawRingCounter(boolean gametypeinfoshown)
 			using srb2::Draw;
 			Draw row = Draw(LAPS_X+23+3, fy-4).flags(V_HUDTRANS|V_SLIDEIN|splitflags).font(Draw::Font::kThinTimer).colormap(ringmap);
 			row.text("{:02}", abs(stplyr->hudrings));
+
+			if (cv_toggle_rings_excess.value && stplyr->superring > 1 && abs(stplyr->hudrings) >= 19) {
+				// Draw excess rings (skypegiggle)
+				row.font(Draw::Font::kPing).x(12).y(4).colormap(R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_MINT, GTC_CACHE)).text("+");
+				row.font(Draw::Font::kThinTimer).x(18).colormap(R_GetTranslationColormap(TC_RAINBOW, SKINCOLOR_MINT, GTC_CACHE)).text("{:02}", abs(stplyr->superring));
+			}
 			// V_DrawMappedPatch(LAPS_X+23, fy, V_HUDTRANS|V_SLIDEIN|splitflags, fontv[TALLNUM_FONT].font[rn[0]], ringmap);
 			// V_DrawMappedPatch(LAPS_X+29, fy, V_HUDTRANS|V_SLIDEIN|splitflags, fontv[TALLNUM_FONT].font[rn[1]], ringmap);
 		}
@@ -5965,7 +6067,18 @@ static void K_drawInput(void)
 	};
 	INT32 k = r_splitscreen <= 1 ? r_splitscreen : 2 + (viewnum & 1);
 	INT32 flags = def[k][2] | V_SPLITSCREEN;
-	char mode = ((stplyr->pflags & PF_ANALOGSTICK) ? '4' : '2') + (r_splitscreen > 1);
+
+	char mode = ((stplyr->pflags & PF_ANALOGSTICK) ? '4' : '2');
+	if (cv_inputdisplaytoggle.value) {
+		mode = cv_inputdisplaytoggle.value;
+	}
+	mode += (r_splitscreen > 1);
+
+	if (cv_inputdisplaytogglesize.value) {
+		mode += 1;
+		def[k][0] = 290;
+		def[k][1] = 178;
+	}
 	bool local = !demo.playback && P_IsMachineLocalPlayer(stplyr);
 	fixed_t slide = K_GetDialogueSlide(FRACUNIT);
 	INT32 tallySlide = []() -> INT32
@@ -6000,20 +6113,15 @@ static void K_drawInput(void)
 		def[0][1] -= 24 + Easing_Linear(t * FRACUNIT / kDelay, 0, 7);
 	}
 
-	if (cv_oldinputdisplay.value)
-	{
-		N_drawOldInput();
-	}
-	else
-		K_DrawInputDisplay(
-			def[k][0] - FixedToFloat(34 * slide),
-			def[k][1] - FixedToFloat(51 * slide) + tallySlide,
-			flags,
-			mode,
-			(local ? G_LocalSplitscreenPartyPosition : G_PartyPosition)(stplyr - players),
-			local,
-			stplyr->speed > 0
-		);
+	K_DrawInputDisplay(
+		def[k][0] - FixedToFloat(34 * slide),
+		def[k][1] - FixedToFloat(51 * slide) + tallySlide,
+		flags,
+		mode,
+		(local ? G_LocalSplitscreenPartyPosition : G_PartyPosition)(stplyr - players),
+		local,
+		stplyr->speed > 0
+	);
 }
 
 static void K_drawChallengerScreen(void)

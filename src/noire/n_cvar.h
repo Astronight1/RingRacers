@@ -31,6 +31,9 @@ extern consvar_t cv_driftgaugeoffset;
 extern consvar_t cv_gingeritemtimers;
 extern consvar_t cv_rouletteonplayer;
 extern consvar_t cv_show_riders_finish_ticker;
+extern consvar_t cv_toggle_rings_excess;
+extern consvar_t cv_inputdisplaytoggle;
+extern consvar_t cv_inputdisplaytogglesize;
 
 void ColorHUD_OnChange(void);
 

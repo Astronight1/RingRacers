@@ -79,6 +79,8 @@ extern void RR_ridersFinishTick(void);
 extern void RR_resetRidersFinishTicker(void);
 extern void RR_DrawKartLapsMini(void);
 
+extern boolean isPingDrawn;
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

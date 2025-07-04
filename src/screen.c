@@ -42,6 +42,9 @@
 #include "hardware/hw_model.h"
 #endif
 
+#include "noire/n_cvar.h"
+#include "noire/n_hud.h"
+
 // SRB2Kart
 #include "r_fps.h" // R_GetFramerateCap
 
@@ -531,6 +534,21 @@ void SCR_DisplayTicRate(void)
 	UINT32 cap = R_GetFramerateCap();
 	UINT32 benchmark = (cap == 0) ? I_GetRefreshRate() : cap;
 	INT32 x = 317;
+	const boolean isDrawingInput = gamestate == GS_LEVEL && cv_drawinput.value && cv_inputdisplaytogglesize.value;
+	const boolean isDrawingPing = isPingDrawn && r_splitscreen == 0;
+
+	if (isDrawingPing)
+	{
+		x = 297;
+		// if (isDrawingInput)
+		// 	x -= 10;
+	}
+	
+	if (isDrawingInput)
+	{
+		x -= (isDrawingPing) ? 28 : 27;
+	}
+	
 	double fps = round(averageFPS);
 
 	if (fps > (benchmark * 0.9))
@@ -561,6 +579,7 @@ void SCR_DisplayTicRate(void)
 	V_DrawPingNum(x<<FRACBITS, 190<<FRACBITS, V_SNAPTOBOTTOM|V_SNAPTORIGHT, fps, ticcntcolor);
 }
 
+
 // SCR_DisplayLocalPing
 // Used to draw the user's local ping next to the framerate for a quick check without having to hold TAB for instance. By default, it only shows up if your ping is too high and risks getting you kicked.
 
@@ -580,10 +599,16 @@ void SCR_DisplayLocalPing(void)
 	UINT32 mindelay = playerdelaytable[consoleplayer];
 	UINT32 ping = playerpingtable[consoleplayer];
 	UINT32 pl = playerpacketlosstable[consoleplayer];
+	
+	// RADIO: To the side looks cleaner then showing it vertically
+	// INT32 dispy = cv_ticrate.value ? 170 : 181;
+	INT32 dispy = 189;
+	INT32 dispx = 298;
 
-	INT32 dispy = cv_ticrate.value ? 170 : 181;
+	if (gamestate == GS_LEVEL && cv_drawinput.value && cv_inputdisplaytogglesize.value)
+		dispx = 270;
 
-	HU_drawPing(307 * FRACUNIT, dispy * FRACUNIT, ping, mindelay, pl, V_SNAPTORIGHT | V_SNAPTOBOTTOM, 0);
+	HU_drawPing(dispx * FRACUNIT, dispy * FRACUNIT, ping, mindelay, pl, V_SNAPTORIGHT | V_SNAPTOBOTTOM, 1);
 }
 
 

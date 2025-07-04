@@ -1530,6 +1530,16 @@ consvar_t cv_driftgaugeoffset = Player("rrdriftgaugeoffset", "0").floating_point
 consvar_t cv_gingeritemtimers = Player("huditemtimers", "On").on_off();
 consvar_t cv_rouletteonplayer = Player("rouletteonplayer", "On").on_off();
 consvar_t cv_show_riders_finish_ticker = Player("ridersfinishticker", "On").on_off().onchange_noinit(KartFinishLineTicker_OnChange);
+consvar_t cv_toggle_rings_excess = Player("showringsoverflow", "On").on_off();
+
+consvar_t cv_inputdisplaytoggle = Player("inputdisplaytoggle", "Digital").values({
+	{'2', "Digital"}, 
+	{'4', "Analog"}
+});
+consvar_t cv_inputdisplaytogglesize = Player("inputdisplaytogglesize", "Mini").values({
+	{0, "Normal"}, 
+	{1, "Mini"}
+});
 
 //
 // Initialized by CVarList::load...
