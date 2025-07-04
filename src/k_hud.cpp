@@ -6852,7 +6852,11 @@ void K_drawKartHUD(void)
 		K_drawMiniPing();
 	}
 
-	K_drawKartPowerUps();
+	//if (cv_gingeritemtimers.value) {
+	RR_DrawItemTimers();
+	//} else {
+	//	K_drawKartPowerUps();
+	//}
 
 	if (K_DirectorIsAvailable(viewnum) == true && LUA_HudEnabled(hud_textspectator))
 	{

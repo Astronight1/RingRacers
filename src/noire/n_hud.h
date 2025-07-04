@@ -59,6 +59,7 @@ patch_t *K_getItemMulPatch(boolean small);
 
 void N_LoadColorizedHud(void);
 void N_ReloadHUDColorCvar(void);
+extern void RR_DrawItemTimers(void);
 extern CV_PossibleValue_t HudColor_cons_t[MAXSKINCOLORS+1];
 
 //Input wheel

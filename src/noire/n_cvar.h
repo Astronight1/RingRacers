@@ -25,8 +25,10 @@ extern consvar_t cv_oldpositiondisplay;
 extern consvar_t cv_extendedspeedometer;
 extern consvar_t cv_highresportrait;
 
+// shitty port cvars
 extern consvar_t cv_driftgauge;
 extern consvar_t cv_driftgaugeoffset;
+extern consvar_t cv_gingeritemtimers;
 
 void ColorHUD_OnChange(void);
 
